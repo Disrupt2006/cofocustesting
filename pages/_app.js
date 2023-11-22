@@ -1,6 +1,12 @@
-import { requestForToken } from './firebase';
+// import  requestForToken  from '../firebase/firebase.js';
 
-const Notification = () => {
-    requestForToken();
-    //....
-   }
+// export default function index(){
+//     return(
+//         <Notification/>
+//     )
+// }
+
+// const Notification = () => {
+//     requestForToken();
+//     //....
+//    }

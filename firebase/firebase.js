@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { useEffect, useState } from "react";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -13,11 +14,16 @@ const firebaseConfig = {
 
 //https://www.audreyhal.com/blog/push-notifications-with-firebase-in-react 
 
-initializeApp(firebaseConfig);
+const useFirebase = () => {
 
-const messaging = getMessaging();
+  const [messaging, setMessaging] = useState();
 
-export const requestForToken = () => {
+  useEffect(() => {
+    initializeApp(firebaseConfig);
+    setMessaging(getMessaging());
+  })
+
+  const requestForToken = () => {
     return getToken(messaging, { vapidKey: "BNPYLNnUjhKDPOZmxUCvw9ILv5c2D4vgkXppb2ELg37f-hOLi032gP_r1PXvG0f3WsEsy-UNwPXJRftLFeG0j54" })
       .then((currentToken) => {
         if (currentToken) {
@@ -27,50 +33,58 @@ export const requestForToken = () => {
           // Show permission request UI
           console.log('No registration token available. Request permission to generate one.');
         }
-    })
-        .catch((err) => {
+      })
+      .catch((err) => {
         console.log('An error occurred while retrieving token. ', err);
-    });
-};
-
-//notificaciones con app de fondo 
-export const onMessageListener = () =>
-  new Promise((resolve) => {
-    onMessage(messaging, (payload) => {
-      console.log("payload", payload)
-      resolve(payload);
-    });
-  });
-
-  
-
-//estop tampoco anda (viejo)
-/*
-function requestPermission() {
-  console.log("Requesting permission...");
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      console.log("Notification permission granted.");
-      const app = initializeApp(firebaseConfig);
-
-      const messaging = getMessaging(app);
-      getToken(messaging, {
-        vapidKey:
-          "BNPYLNnUjhKDPOZmxUCvw9ILv5c2D4vgkXppb2ELg37f-hOLi032gP_r1PXvG0f3WsEsy-UNwPXJRftLFeG0j54",
-      }).then((currentToken) => {
-        if (currentToken) {
-          console.log("currentToken: ", currentToken);
-        } else {
-          console.log("Can not get token");
-        }
       });
-    } else {
-      console.log("Do not have permission!");
-    }
-  });
+  };
+
+  //notificaciones con app de fondo 
+  const onMessageListener = () =>
+    new Promise((resolve) => {
+      onMessage(messaging, (payload) => {
+        console.log("payload", payload)
+        resolve(payload);
+      });
+    });
+
+
+  return {
+    requestForToken,
+    onMessageListener
+  }
 }
 
-requestPermission();
-*/
+export default useFirebase;
+  
+
+// //estop tampoco anda (viejo)
+// /*
+// function requestPermission() {
+//   console.log("Requesting permission...");
+//   Notification.requestPermission().then((permission) => {
+//     if (permission === "granted") {
+//       console.log("Notification permission granted.");
+//       const app = initializeApp(firebaseConfig);
+
+//       const messaging = getMessaging(app);
+//       getToken(messaging, {
+//         vapidKey:
+//           "BNPYLNnUjhKDPOZmxUCvw9ILv5c2D4vgkXppb2ELg37f-hOLi032gP_r1PXvG0f3WsEsy-UNwPXJRftLFeG0j54",
+//       }).then((currentToken) => {
+//         if (currentToken) {
+//           console.log("currentToken: ", currentToken);
+//         } else {
+//           console.log("Can not get token");
+//         }
+//       });
+//     } else {
+//       console.log("Do not have permission!");
+//     }
+//   });
+// }
+
+// requestPermission();
+// */
 
 
